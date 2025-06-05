@@ -1,0 +1,211 @@
+Componentes 
+
+Barras de navegación
+Tarjetas de contenido
+Formularios
+Listas de elementos
+Pies de página
+-------------------
+CREAR PROYECTO REACT
+
+npm create vite@latest
+
+Colocar nombre al proyecto. (ejercicio-1)
+Elegir React.
+Elegir Javascript + SWC (o Typescript + SWC)
+En ese punto se crea el proyecto ejercicio-1. Una vez se cree el proyecto, hay que ingresar a la carpeta del proyecto desde la terminal o PowerShell.
+
+Este es el comando.
+
+cd ejercicio-1
+
+Luego, debemos instalar el paquete de node a nuestro proyecto. El comando es el siguiente:
+
+npm install
+
+Una vez instalado, ya podemos ejecutar el proyecto con el siguiente comando.
+
+npm run dev.
+---------------------------------------------------
+
+
+			PROPS
+Las props para pasar datos de un componente padre a un componente hijo. Funcionan como parámetros que permiten personalizar los componentes y hacerlos verdaderamente reutilizables.
+EJ:
+
+Card.jsx
+const Card = ({title, description})=>{
+
+    return(
+
+        <section>
+            <h2>
+                {title}
+            </h2>
+            <p>
+                {description}
+            </p>
+        </section>
+    )
+}
+
+export default Card;
+
+App.jsx
+
+function App() {
+  const info = [
+    {title: 'Card 1', description: 'descripcion de la card 1'},
+    {title: 'Card 2', description: 'descripcion de la card 2'},
+    {title: 'Card 3', description: 'descripcion de la card 3'},
+  ]
+  return (
+    <>
+      {info.map((card, index) => (
+        <Card 
+          key={index} 
+          title={card.title} 
+          description={card.description}
+        />
+      ))}
+    </>
+  )
+}
+-------------------------
+
+useState
+
+
+import{useState} from "react";
+
+const Counter = ()=>{
+    const [count, setCount] = useState(0);
+
+
+return(
+
+    <div>
+        <p>el contador esta en : {count} </p>
+        <button onClick={()=> setCount(count+1)}>Incre</button>
+        <button onClick={()=> setCount(count-1)}>Decre</button>
+
+    </div>
+)
+
+
+}
+
+export default Counter;
+
+-------------------------------------------------
+
+
+import { useState } from "react";
+const ToggleButton = ()=>{
+
+    const[isActive, setIsActive] = useState(false);
+
+return (
+
+    <button onClick={()=> setIsActive(!isActive)}>
+
+        {isActive ? "✅Activo" : "❌Inactivo"}
+    </button>
+
+
+)
+
+}
+
+
+export default ToggleButton;
+
+-----------------------------------------
+Eventos y manejo de estados
+
+Los eventos en React funcionan de manera similar a los eventos nativos de HTML, pero con algunas diferencias importantes. React implementa un sistema de eventos sintéticos que actúan como una capa de abstracción sobre los eventos nativos del navegador.
+en React no pasamos strings a los manejadores de eventos, sino funciones. Esto nos permite ejecutar código más complejo y manipular el estado de nuestros componentes cuando ocurre un evento.
+
+¿Qué otros eventos podemos manejar en React?
+React soporta una amplia variedad de eventos que podemos utilizar para crear interfaces interactivas:
+
+Eventos de ratón: onClick, onMouseOver, onMouseOut
+Eventos de formulario: onChange, onSubmit, onFocus, onBlur
+Eventos de teclado: onKeyDown, onKeyPress, onKeyUp
+Eventos de clipboard: onCopy, onCut, onPaste
+
+import React, { useState } from 'react';
+
+const NameForm = () => {
+  const [name, setName] = useState('');
+  
+  return (
+    <div>
+      <input 
+        type="text" 
+        placeholder="Ingresa tu nombre" 
+        value={name} 
+        onChange={(event) => setName(event.target.value)} 
+      />
+      <p>Hola, {name ? name : 'visitante'}</p>
+    </div>
+  );
+};
+
+export default NameForm;
+-------------------------------------------------------------------
+Efectos secundarios useEffect
+
+El hook useEffect en React permite ejecutar efectos secundarios en componentes funcionales, como actualizaciones de datos o suscripciones a eventos. A continuación, te explicamos sus principales elementos:
+
+Función de efecto: El primer argumento de useEffect es una función que se ejecuta después de cada renderizado del componente. Aquí puedes realizar acciones como llamadas a API, suscripciones o cambios en el DOM.
+
+Función de limpieza: Al retornar una función dentro de useEffect, defines una acción de limpieza que se ejecutará antes de desmontar el componente o antes de que el efecto se vuelva a ejecutar. Esto es útil para liberar recursos, como detener suscripciones o limpiar temporizadores.
+
+Array de dependencias: El segundo argumento es un array de dependencias que indica cuándo debe ejecutarse el efecto. Si el array está vacío ([]), el efecto se ejecutará solo una vez al montar el componente y no se volverá a ejecutar en renderizados futuros. Si incluye variables o estados, el efecto se ejecutará cada vez que alguno de ellos cambie.
+
+import { useEffect } from 'react';
+
+function ComponenteConEfecto() {
+// Ejecución inicial del componente
+useEffect(() => {
+  // Código que quieres ejecutar cuando el componente se monta
+  console.log('Componente montado');
+
+  // Retorno opcional: función de limpieza que se ejecuta cuando el componente se desmonta
+  return () => {
+    console.log('Componente desmontado');
+  };
+}, [/* dependencias */]); // Dependencias vacías: solo se ejecuta una vez al montar y desmontar
+--------------------------------
+
+npm install saas
+
+npm install tailwindcss @tailwindcss/vite
+
+https://tailwindcss.com/
+
+
+1.- npm install tailwindcss @tailwindcss/vite
+
+2.- en vite.config.ts, agregar las siguientes lineas:
+
+import { defineConfig } from 'vite'
+
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+
+plugins: [
+
+tailwindcss(),
+
+],
+
+})
+
+3.- en index.css poner esto hasta arriba:
+
+@import "tailwindcss";
+
+4.- ya ahora si npm run dev

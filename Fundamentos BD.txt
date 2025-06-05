@@ -1,0 +1,157 @@
+SQL Básico y Avanzado: Resumen Integrado
+1. Sentencias Básicas
+SELECT, INSERT, UPDATE, DELETE
+
+CREATE DATABASE, CREATE TABLE, ALTER TABLE, DROP TABLE
+
+2. Tablas de Ejemplo
+sql
+
+CREATE DATABASE IF NOT EXISTS empresa;
+USE empresa;
+
+-- Tabla Clientes
+CREATE TABLE IF NOT EXISTS clients (
+  client_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  phone_number VARCHAR(15) NOT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Tabla Productos
+CREATE TABLE IF NOT EXISTS products (
+  product_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  sku VARCHAR(20) NOT NULL UNIQUE,
+  name VARCHAR(100) NOT NULL,
+  slug VARCHAR(200) NOT NULL UNIQUE,
+  description TEXT,
+  price DECIMAL(10,2) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Tabla Facturas (Bills)
+CREATE TABLE IF NOT EXISTS bills (
+  bill_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  client_id INT UNSIGNED NOT NULL,
+  total DECIMAL(12,2) DEFAULT 0.00,
+  status ENUM('open', 'paid', 'lost') NOT NULL DEFAULT 'open',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_bills_client FOREIGN KEY (client_id) REFERENCES clients(client_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+-- Tabla de Productos en Facturas (relación n:m)
+CREATE TABLE IF NOT EXISTS bill_products (
+  bill_product_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  bill_id INT UNSIGNED NOT NULL,
+  product_id INT UNSIGNED NOT NULL,
+  quantity INT UNSIGNED NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_billproducts_bill FOREIGN KEY (bill_id) REFERENCES bills(bill_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_billproducts_product FOREIGN KEY (product_id) REFERENCES products(product_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  UNIQUE KEY uk_bill_product (bill_id, product_id) -- evita duplicados del mismo producto en una factura
+);
+
+3. Consultas y Joins
+Obtener productos con comentarios (join incorrecto corregido):
+
+sql
+Copiar
+Editar
+SELECT price
+FROM products
+JOIN comments ON products.product_id = comments.product_id
+WHERE sku = 'XXXXXXXXXXX';
+Consultas con LIKE y comodines % para buscar patrones:
+
+sql
+Copiar
+Editar
+SELECT name FROM clients WHERE name LIKE 'Mr.%';
+SELECT name FROM clients WHERE name LIKE 'Mr.%III' OR name LIKE 'Mr.%IV';
+Consultas con condiciones numéricas y fechas:
+
+sql
+Copiar
+Editar
+SELECT name, price FROM products WHERE price * 10 BETWEEN 5000 AND 7000;
+
+SELECT * FROM bill_products WHERE date_added BETWEEN '2024-06-04' AND '2024-06-05';
+
+SELECT * FROM bill_products
+WHERE date_added BETWEEN '2024-06-04' AND '2024-06-05'
+AND product_id IN (779,500,1986);
+4. Manipulación de Datos (DML)
+Insertar con ON DUPLICATE KEY UPDATE para evitar duplicados:
+
+sql
+Copiar
+Editar
+INSERT INTO products(name, slug)
+VALUES ('lapiz blanco', 'lapiz-blanco'), ('lapiz negro', 'lapiz-negro')
+ON DUPLICATE KEY UPDATE description = CONCAT('hola: ', VALUES(slug));
+Actualizaciones condicionales y con límites:
+
+sql
+Copiar
+Editar
+UPDATE clients SET phone_number = '3' WHERE client_id = 12 LIMIT 1;
+
+UPDATE clients SET phone_number = NULL WHERE name LIKE 'laura%' OR name LIKE 'claire%' LIMIT 10;
+Actualización de columnas y renombrado con ALTER TABLE:
+
+sql
+Copiar
+Editar
+ALTER TABLE test ADD COLUMN price FLOAT;
+ALTER TABLE test DROP COLUMN price;
+ALTER TABLE test MODIFY COLUMN price DECIMAL(10,3) NOT NULL;
+ALTER TABLE test RENAME COLUMN price TO prices;
+ALTER TABLE test RENAME TO tests;
+5. Funciones de Agregado y Agrupamiento
+Contar, sumar, promedio, agrupar por proveedor email:
+
+sql
+Copiar
+Editar
+SELECT COUNT(*) FROM products;
+
+SELECT SUM(stock) FROM products;
+
+SELECT AVG(price) FROM products;
+
+SELECT
+  CASE
+    WHEN email LIKE '%@gmail.com' THEN 'Gmail'
+    WHEN email LIKE '%@hotmail.com' THEN 'Hotmail'
+    WHEN email LIKE '%@yahoo.com' THEN 'Yahoo'
+    ELSE 'Otro proveedor'
+  END AS proveedor,
+  COUNT(*) AS total_clientes
+FROM clients
+GROUP BY proveedor
+HAVING total_clientes < 100
+ORDER BY total_clientes ASC;
+6. Relaciones y Normalización
+Relaciones 1:1, 1:N, N:M aplicadas con claves foráneas y tablas intermedias (bill_products).
+
+Uso de ON DELETE CASCADE y ON UPDATE CASCADE para mantener integridad referencial.
+
+7. Ejemplo Completo: Obtener facturas con datos del cliente
+sql
+Copiar
+Editar
+SELECT bill.bill_id, bill.status, clients.name
+FROM bills AS bill
+LEFT JOIN clients ON bill.client_id = clients.client_id;

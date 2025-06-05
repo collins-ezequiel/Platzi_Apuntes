@@ -1,0 +1,43 @@
+clase 1
+
+Framework node js
+middleware
+enrutamiento
+
+autenticación login
+
+API REST
+
+npm init -y
+npm install express --save
+
+const express = require('express');
+
+const app = express();
+
+const PORT = 3000;
+
+app.get('/', (req, res) => {
+
+    res.send('hello world');
+
+});
+
+app.listen(PORT, () => {
+
+    console.log('anda cheto');
+
+});
+
+
+---------------clase 2-----------
+
+
+nvm -v                # Ver la versión de NVM
+nvm install 22        # Instalar Node.js versión 22
+nvm ls                # Listar versiones instal
+
+
+node --watch app.js para ver cambios en tiempo real
+
+
