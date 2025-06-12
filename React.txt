@@ -155,6 +155,7 @@ const NameForm = () => {
 export default NameForm;
 -------------------------------------------------------------------
 Efectos secundarios useEffect
+https://urianviera.com/reactjs/guia-para-dominar-el-hook-usefetch
 
 El hook useEffect en React permite ejecutar efectos secundarios en componentes funcionales, como actualizaciones de datos o suscripciones a eventos. A continuación, te explicamos sus principales elementos:
 
@@ -209,3 +210,366 @@ tailwindcss(),
 @import "tailwindcss";
 
 4.- ya ahora si npm run dev
+
+
+---------------------------------------
+
+Dato dinámicos y datos estáticos
+
+Datos estáticos
+Los datos estáticos son aquellos que:
+
+Están definidos directamente en nuestro código
+No se modifican durante la ejecución de la aplicación
+Son únicamente de lectura
+Se comparan con un libro que podemos leer pero no modificar
+Ejemplos comunes de datos estáticos en aplicaciones web:
+
+Listas de navegación
+Configuraciones predeterminadas
+Textos fijos como títulos o descripciones
+Datos de ejemplo o placeholder
+Datos dinámicos
+Por otro lado, los datos dinámicos:
+
+Provienen generalmente de fuentes externas como APIs o librerías
+Pueden ser modificados durante la ejecución
+Permiten operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
+Cambian con el tiempo o según las interacciones del usuario
+Ejemplos de datos dinámicos:
+
+Información de perfil de usuario
+Datos meteorológicos
+Noticias actualizadas
+Resultados de búsquedas
+
+
+Ej static component
+const StaticComponent = () => {
+  // Definimos nuestros datos estáticos como un array
+  const items = ["manzana", "banana", "cereza"];
+
+  return (
+    <ul>
+      {/* Utilizamos map para iterar sobre cada elemento del array */}
+      {items.map((item, index) => (
+        <li key={index}>{item}</li>
+      ))}
+    </ul>
+  );
+};
+
+export default StaticComponent;
+
+
+-------------------------
+
+User List con Fetch en React
+
+import React, { useState, useEffect } from 'react';
+
+const SearchPosts = () => {
+    const [query, setQuery] = useState('');
+    const [posts, setPosts] = useState([]);
+
+    useEffect(() => {
+        fetch(`https://jsonplaceholder.typicode.com/posts${query ? `?title_like=${query}` : ''}`)
+            .then(response => response.json())
+            .then(data => setPosts(data))
+            .catch((error) => console.error("Error fetchin data: ", error))
+    }, [query]);
+
+    return (
+        <div>
+            <h2>Lista de usuarios</h2>
+            <input
+                type="text"
+                placeholder="Buscar por título"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+            />
+            <ul>
+                {posts.map(post => (
+                    <li key={post.id}>{post.title}</li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+export default SearchPosts;
+export default SearchPosts;
+
+---------------------------------------------------
+
+
+Manejo de estados complejos en React con useReducer
+(Muchas opciones)
+
+import { useReducer } from "react";
+
+const reducer = (state, action) => {
+
+    switch (action.type) {
+        case "increment":
+            return { count: state.count + 1 };
+        case "decrement":
+            return { count: state.count - 1 };
+        default:
+            return state;
+
+    }
+}
+
+const Counter = () => {
+const [state, dispatch] = useReducer(reducer, {count: 0});
+return (
+
+    <div>
+        <p>Contador: {state.count} </p>
+        <button onClick={()=> dispatch({type: "increment"}) }>increment</button>
+        <button onClick={()=> dispatch({type: "decrement"}) }>decrement</button>
+
+    </div>
+)
+
+}
+
+export default Counter;
+
+-----------------------------------------------
+Context API en React: Manejo de Estados Globales y Proveedores
+
+¿Qué es un estado global y por qué necesitamos Context API?
+Un estado global en React nos permite compartir datos entre componentes sin importar dónde se encuentren en el árbol de componentes. Esto es especialmente útil cuando:
+
+Necesitamos que múltiples componentes accedan a los mismos datos
+Queremos evitar el "prop drilling" (pasar props a través de múltiples niveles de componentes)
+Buscamos centralizar la lógica de estado para facilitar su mantenimiento
+
+
+import { useContext, createContext, useState } from 'react'
+
+import Counter from './components/Counter/Counter'
+import './App.css'
+
+const ThemeContext = createContext();
+
+function ThemeProvider({ children }) {
+
+  const [theme, setTheme] = useState("light")
+
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"))
+  }
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  )
+}
+
+function ThemeButton() {
+
+  const { theme, toggleTheme } = useContext(ThemeContext)
+
+  return (
+    <button
+      onClick={toggleTheme}
+
+      style={{
+        backgroundColor: theme === "light" ? "#FFF" : "#333",
+        color: theme === "light" ? "#000" : "#FFF",
+      }
+
+      }
+    >
+      Cambiar tema
+    </button>
+  )
+}
+
+function App() {
+
+  return (
+    <>
+      <ThemeProvider>
+        <ThemeButton></ThemeButton>
+      </ThemeProvider>
+    </>
+  )
+}
+
+export default App
+
+
+
+-------------------------------------------------
+Custom Hooks
+
+
+permite reutilizar lógica entre componentes, mejorando la organización del código y facilitando el mantenimiento de aplicaciones.
+
+-------------------------------------
+Optimización de Componentes en React con React.memo y Hooks
+
+React.memo es una función de orden superior (HOF) que nos permite optimizar el rendimiento de nuestros componentes funcionales. Su principal beneficio es que evita re-renderizados innecesarios, ya que solo permite que un componente se vuelva a renderizar cuando sus props cambian.
+
+
+---------------------------
+
+Typescript en React
+
+TypeScript se ha convertido en una herramienta fundamental para los desarrolladores de React por varias razones importantes. Al implementar este lenguaje en nuestros proyectos, obtenemos beneficios significativos que transforman nuestra experiencia de desarrollo:
+
+Mayor visibilidad del proyecto: Nos proporciona una comprensión más clara de la estructura de nuestro código, incluyendo los tipos de datos que ingresan y salen de nuestras funciones.
+Detección temprana de errores: Facilita enormemente el proceso de debugging al permitirnos identificar problemas relacionados con tipos de datos incompatibles antes de ejecutar el código.
+Documentación implícita: El tipado actúa como una forma de documentación que ayuda a entender cómo deben utilizarse los componentes.
+La principal ventaja de TypeScript es que nos obliga a ser explícitos sobre los tipos de datos que utilizamos, eliminando ambigüedades y reduciendo la posibilidad de errores en tiempo de ejecución.
+
+
+type ButtonProps = {
+
+    onclick: () => void;
+    label: string | number;
+}
+const Button = ({ onclick, label }: ButtonProps) => {
+
+    return <button onClick={onclick}>{label} </button>
+}
+
+export default Button;
+
+
+function App() {
+
+    const handleClick = () => alert("Ya estoy clickeando")
+
+  return (
+    <>
+      <Button onclick={handleClick} label="Click me" ></Button>
+    </>
+  )
+}
+
+-------------------------------------------
+Tipado de Estados y Funciones en TypeScript para React
+
+Beneficios de tipar estados
+La tipificación de estados nos proporciona varios beneficios importantes:
+
+Previene errores de coerción de tipos que son comunes en JavaScript.
+Mejora la legibilidad del código para otros desarrolladores.
+Proporciona autocompletado y sugerencias en el editor.
+
+
+¿Cómo tipar un Context API en React?
+Context API es una herramienta poderosa para compartir datos entre componentes sin necesidad de pasar props manualmente. Al combinarlo con TypeScript, podemos asegurar que todos los componentes que consumen el contexto reciban exactamente lo que esperan.
+
+Para tipar un contexto, necesitamos definir la estructura de los datos que contendrá:
+
+// Definimos el tipo del contexto
+type ThemeContextType = {
+  theme: "light" | "dark";
+  toggleTheme: () => void;
+};
+
+// Creamos el contexto con su tipo
+const ThemeContext = createContext<ThemeContextType>({
+  theme: "light",
+  toggleTheme: () => {}
+});
+
+// Tipamos el proveedor del contexto
+const ThemeProvider = ({ children }: { children: React.ReactNode }): React.ReactNode => {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
+  
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+En este ejemplo, hemos definido:
+
+Un tipo ThemeContextType que especifica la estructura del contexto
+Un valor inicial para el contexto que cumple con el tipo definido
+Un proveedor tipado que acepta children como React.ReactNode
+Ventajas de tipar el Context API
+Consistencia: Aseguramos que todos los componentes que consumen el contexto reciban los datos en el formato esperado.
+Seguridad de tipos: TypeScript verifica que estemos proporcionando todos los valores requeridos al contexto.
+Mejor experiencia de desarrollo: Obtenemos autocompletado y documentación en tiempo real.
+
+
+----------------------
+NOVEDADES Y MEJORAS REACT 19
+
+¿Cuáles son las principales novedades de React 19?
+React 19 representa un salto cualitativo en varios aspectos fundamentales del desarrollo frontend. Entre sus mejoras más destacadas encontramos:
+
+¿Qué son los Server Components y qué beneficios aportan?
+Los Server Components son una de las características más revolucionarias de React 19. Estos componentes:
+
+Mejoran significativamente el SEO de las aplicaciones React.
+Permiten cargar datos inicialmente desde el servidor.
+Facilitan el uso de fetch desde el servidor para precargar datos.
+Esta funcionalidad es especialmente útil para aplicaciones que necesitan un buen posicionamiento en buscadores y una carga inicial de datos eficiente.
+
+¿Cómo funcionan las nuevas directivas use client y use server?
+React 19 introduce directivas que permiten especificar explícitamente dónde se ejecutará cada componente:
+
+use client: Marca los componentes que se renderizarán en el navegador.
+use server: Indica los componentes que se ejecutarán en el servidor.
+Estas directivas proporcionan un control más preciso sobre el comportamiento de la aplicación y mejoran la separación de responsabilidades entre cliente y servidor.
+
+¿Qué son los Actions y Server Actions?
+Los Actions vienen a reemplazar los eventos tradicionales como onSubmit en formularios, mientras que los Server Actions permiten:
+
+Realizar peticiones asíncronas desde el cliente a funciones del servidor.
+Consultar bases de datos directamente desde componentes del cliente.
+Simplificar la arquitectura de aplicaciones que requieren comunicación cliente-servidor.
+¿Qué nuevos hooks se introducen en React 19?
+React 19 amplía su arsenal de hooks con nuevas herramientas diseñadas para simplificar tareas comunes:
+
+¿Cómo mejoran los hooks para formularios?
+Se introducen varios hooks específicos para el manejo de formularios:
+
+useActionState: Simplifica el manejo del estado en formularios.
+useFormStatus: Monitorea el estado del envío de formularios.
+useOptimistic: Gestiona operaciones optimistas, mejorando la percepción de velocidad para el usuario.
+Estos hooks reducen significativamente la cantidad de código necesario para implementar formularios interactivos y con buena experiencia de usuario.
+
+¿Qué es la nueva API Use y para qué sirve?
+La API Use es una nueva adición que:
+
+Facilita el manejo de promesas dentro del renderizado.
+Es compatible con Suspense.
+Mejora la experiencia del usuario durante la carga de datos.
+Esta API simplifica considerablemente el trabajo con datos asíncronos, uno de los aspectos más complejos del desarrollo frontend.
+
+¿Qué otras mejoras incluye React 19?
+Además de las características principales, React 19 trae consigo otras mejoras significativas:
+
+¿Cómo se optimiza la carga de recursos?
+React 19 introduce nuevas APIs para precargar datos:
+
+preconnect: Establece conexiones anticipadas.
+preload: Precarga recursos antes de que sean necesarios.
+Carga optimizada de scripts y estilos, cargando solo lo necesario en cada momento.
+Estas optimizaciones resultan en aplicaciones más rápidas y eficientes.
+
+¿Qué cambios hay en la API de React?
+Se han realizado mejoras significativas en la API:
+
+Ahora es posible utilizar ref como props sin necesidad de forwardRef.
+Se puede usar context sin necesidad de un provider.
+Se introduce soporte para metadatos como title y meta.
+Mejor soporte para custom elements.
+
+
